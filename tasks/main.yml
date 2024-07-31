@@ -1,0 +1,37 @@
+---
+- name: Precheck redfish login
+  community.general.xcc_redfish_command:
+    category: Raw
+    command: GetResource
+    baseuri: "{{ baseuri }}:443"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_uri: "/redfish/v1/Systems/1"
+    timeout: 20
+
+- name: Eject all virtual media
+  community.general.xcc_redfish_command:
+    category: Manager
+    command: VirtualMediaEject
+    baseuri: "{{ baseuri }}:443"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_id: "1"
+
+- name: Insert Virtual Media
+  community.general.xcc_redfish_command:
+    category: Manager
+    command: VirtualMediaInsert
+    baseuri: "{{ baseuri }}:443"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    virtual_media:
+      image_url: "{{ ansible_facts['default_ipv4']['address'] }}:/nfs_server/isos/{{ esxi_hostname }}.iso"
+      inserted: true
+      transfer_protocol_type: nfs
+      media_types:
+        - CD
+        - DVD
+    resource_id: "1"
+
+
